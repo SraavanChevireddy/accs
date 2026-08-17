@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zinnov | Director Operations Dashboard</title>
+<style>
+:root{--navy:#0b2344;--blue:#175cd3;--sky:#eaf2ff;--teal:#0e7490;--green:#15803d;--amber:#d97706;--red:#b42318;--purple:#6941c6;--ink:#172033;--muted:#667085;--line:#e4e7ec;--bg:#f6f8fb;--card:#fff}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(120deg,var(--navy),#153b6d);color:#fff;padding:22px 28px;display:flex;justify-content:space-between;align-items:center;gap:20px;box-shadow:0 4px 18px #0b234426}
+.brand h1{font-size:22px;margin:0 0 5px}.brand p{margin:0;color:#d5e4fb;font-size:13px}.badge{border:1px solid #ffffff55;padding:8px 12px;border-radius:999px;font-size:12px;background:#ffffff12;white-space:nowrap}
+.shell{display:grid;grid-template-columns:230px 1fr;min-height:calc(100vh - 88px)}
+aside{background:#fff;border-right:1px solid var(--line);padding:18px 12px;position:sticky;top:0;height:calc(100vh - 88px)}
+.navbtn{display:flex;width:100%;border:0;background:transparent;padding:11px 12px;border-radius:9px;color:#475467;cursor:pointer;font-weight:650;text-align:left;margin:3px 0}.navbtn:hover{background:#f2f4f7}.navbtn.active{background:#eaf2ff;color:#174ea6}
+.side-note{position:absolute;bottom:18px;left:14px;right:14px;padding:12px;border-radius:10px;background:#f8fafc;border:1px solid var(--line);font-size:11px;color:var(--muted);line-height:1.5}
+main{padding:24px 26px 40px;min-width:0}.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-bottom:18px}.field label{display:block;font-size:11px;font-weight:700;color:#475467;margin:0 0 5px;text-transform:uppercase;letter-spacing:.04em}
+select,input,textarea{font:inherit;border:1px solid #d0d5dd;border-radius:8px;padding:9px 10px;background:#fff;color:var(--ink);outline:none}select:focus,input:focus,textarea:focus{border-color:#84adff;box-shadow:0 0 0 3px #dbe8ff}.btn{border:0;border-radius:8px;padding:10px 13px;font-weight:700;cursor:pointer}.btn.primary{background:var(--blue);color:#fff}.btn.secondary{background:#fff;color:#344054;border:1px solid #d0d5dd}.btn.danger{background:#fff1f0;color:var(--red);border:1px solid #fecdca}.spacer{flex:1}
+.view{display:none}.view.active{display:block}.section-title{margin:0 0 4px;font-size:20px}.section-sub{margin:0 0 18px;color:var(--muted);font-size:13px}
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(145px,1fr));gap:12px;margin-bottom:18px}.kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px;box-shadow:0 1px 3px #1018280a}.kpi .label{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:800}.kpi .value{font-size:24px;font-weight:800;margin-top:8px}.kpi .hint{font-size:11px;color:var(--muted);margin-top:4px}.kpi.attn{border-left:4px solid var(--amber)}.kpi.risk{border-left:4px solid var(--red)}.kpi.good{border-left:4px solid var(--green)}
+.grid2{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-bottom:18px}.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:0 1px 3px #1018280a;overflow:hidden}.card h3{font-size:14px;margin:0 0 14px}.card p.small{font-size:11px;color:var(--muted);margin:0 0 12px}
+.bar-row{display:grid;grid-template-columns:130px 1fr 85px;gap:10px;align-items:center;margin:9px 0;font-size:12px}.bar-track{height:10px;background:#eef2f6;border-radius:99px;overflow:hidden}.bar{height:100%;background:linear-gradient(90deg,#175cd3,#53b1fd);border-radius:99px}.bar.over{background:linear-gradient(90deg,#d97706,#fdb022)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted)}.dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:5px}.dot.g{background:var(--green)}.dot.a{background:var(--amber)}.dot.r{background:var(--red)}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px;background:#fff}table{border-collapse:collapse;width:100%;min-width:1050px}th{position:sticky;top:0;z-index:1;background:#f8fafc;color:#475467;font-size:10px;text-transform:uppercase;letter-spacing:.035em;text-align:left;padding:10px;border-bottom:1px solid var(--line);white-space:nowrap}td{padding:9px 10px;border-bottom:1px solid #eef1f4;font-size:12px;vertical-align:top}tbody tr:hover{background:#fafcff}.pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800;white-space:nowrap}.green{background:#ecfdf3;color:#027a48}.amber{background:#fffaeb;color:#b54708}.red{background:#fef3f2;color:#b42318}.blue{background:#eff8ff;color:#175cd3}.gray{background:#f2f4f7;color:#475467}.purple{background:#f4f3ff;color:#6941c6}
+.empty{padding:34px;text-align:center;color:var(--muted);font-size:13px}.modal{display:none;position:fixed;inset:0;background:#10182888;z-index:20;align-items:center;justify-content:center;padding:20px}.modal.show{display:flex}.dialog{width:min(920px,96vw);max-height:90vh;overflow:auto;background:#fff;border-radius:14px;box-shadow:0 25px 60px #10182844}.dialog-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.dialog-head h3{margin:0}.form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:18px}.form-grid .field input,.form-grid .field select,.form-grid .field textarea{width:100%}.dialog-foot{padding:14px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:9px}.iconbtn{border:0;background:transparent;cursor:pointer;font-size:18px;color:#667085}.row-actions{white-space:nowrap}.row-actions button{border:0;background:transparent;color:#175cd3;cursor:pointer;font-weight:700;font-size:11px;margin-right:8px}.row-actions button.del{color:var(--red)}
+.notice{padding:11px 13px;border-radius:9px;background:#eff8ff;border:1px solid #b2ddff;color:#1849a9;font-size:12px;margin-bottom:16px}.risk-list{display:grid;gap:9px}.risk-item{padding:10px 11px;border:1px solid var(--line);border-radius:9px;display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:start}.risk-item strong{font-size:12px}.risk-item span{font-size:11px;color:var(--muted)}
+.team-panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}.team-top{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:end}.entry-tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:16px 0}.entry-tab{border:1px solid var(--line);background:#fff;border-radius:10px;padding:13px;cursor:pointer;text-align:left;font-weight:750;color:#344054}.entry-tab small{display:block;font-weight:500;color:var(--muted);margin-top:4px}.entry-tab.active{border-color:#84adff;background:#eff8ff;color:#175cd3}.inline-form{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.inline-form .field input,.inline-form .field select,.inline-form .field textarea{width:100%}.team-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:16px}.success-note{display:none;padding:10px 12px;border:1px solid #abefc6;background:#ecfdf3;color:#067647;border-radius:8px;font-size:12px;margin-bottom:12px}.success-note.show{display:block}.footer{margin-top:24px;font-size:11px;color:#98a2b3;text-align:center}
+@media(max-width:1100px){.entry-tabs{grid-template-columns:repeat(2,1fr)}.team-top{grid-template-columns:1fr 1fr}.kpis{grid-template-columns:repeat(3,1fr)}.grid2{grid-template-columns:1fr}.shell{grid-template-columns:190px 1fr}}@media(max-width:760px){.team-top,.inline-form{grid-template-columns:1fr}.entry-tabs{grid-template-columns:1fr}header{align-items:flex-start}.shell{display:block}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);display:flex;overflow:auto}.navbtn{width:auto;white-space:nowrap}.side-note{display:none}main{padding:16px}.kpis{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}.badge{display:none}}
+</style>
+</head>
+<body>
+<header><div class="brand"><h1>Director Operations – Monthly Client Operations Dashboard</h1><p>Financials · Payments · Escalations · Risks · Vendor Performance</p></div><div class="badge">Zinnov · Hyderabad Corporate Services</div></header>
+<div class="shell"><aside>
+<button class="navbtn active" data-view="dashboard">Executive Dashboard</button>
+<button class="navbtn" data-view="teamEntry">Operations Team Entry</button>
+<button class="navbtn" data-view="expenses">Monthly Expenses</button>
+<button class="navbtn" data-view="payments">Payment Tracker</button>
+<button class="navbtn" data-view="escalations">Escalations</button>
+<button class="navbtn" data-view="actions">Action Tracker</button>
+<button class="navbtn" data-view="vendors">Vendor Performance</button>
+<div class="side-note"><b>Shared workspace</b><br>Everyone with this link reads and writes the same records. Changes appear in other open tabs automatically.</div>
+</aside><main>
+<div class="notice" id="dbStatus" style="display:none"></div>
+<div class="toolbar">
+<div class="field"><label>Reporting Month</label><input type="month" id="globalMonth"></div>
+<div class="field"><label>Client</label><select id="globalClient"></select></div>
+<button class="btn secondary" id="resetFilters">Reset filters</button><div class="spacer"></div>
+<button class="btn secondary" id="exportBtn">Export current view CSV</button>
+<button class="btn primary" id="addBtn">+ Add record</button>
+</div>
+<section id="dashboard" class="view active">
+<h2 class="section-title">Executive Dashboard</h2><p class="section-sub">Exception-led view for Director Operations.</p>
+<div class="kpis">
+<div class="kpi"><div class="label">Total Spend</div><div class="value" id="kSpend">₹0</div><div class="hint">Selected month/client</div></div>
+<div class="kpi"><div class="label">Monthly Budget</div><div class="value" id="kBudget">₹0</div><div class="hint">Approved baseline</div></div>
+<div class="kpi" id="varCard"><div class="label">Budget Variance</div><div class="value" id="kVariance">₹0</div><div class="hint" id="kVariancePct">0.0%</div></div>
+<div class="kpi attn"><div class="label">Outstanding Payments</div><div class="value" id="kOutstanding">₹0</div><div class="hint" id="kOverdueInv">0 overdue invoices</div></div>
+<div class="kpi risk"><div class="label">Open Escalations</div><div class="value" id="kEsc">0</div><div class="hint" id="kCritical">0 high/critical</div></div>
+<div class="kpi attn"><div class="label">Overdue Actions</div><div class="value" id="kActions">0</div><div class="hint">Past due and not closed</div></div>
+</div>
+<div class="grid2">
+<div class="card"><h3>Financial Snapshot by Expense Head</h3><p class="small">Actual spend against monthly budget.</p><div id="financialBars"></div></div>
+<div class="card"><h3>Management Attention</h3><p class="small">Items requiring leadership review or intervention.</p><div id="attentionList" class="risk-list"></div></div>
+</div>
+<div class="grid2">
+<div class="card"><h3>Payment Ageing</h3><div id="ageingBars"></div></div>
+<div class="card"><h3>Operational Health</h3><div class="legend"><span><i class="dot g"></i>Green</span><span><i class="dot a"></i>Amber</span><span><i class="dot r"></i>Red</span></div><div id="healthBars" style="margin-top:14px"></div></div>
+</div>
+</section>
+<section id="teamEntry" class="view"><h2 class="section-title">Operations Team Entry</h2><p class="section-sub">Team members can enter monthly operational details here. Saved entries automatically flow into the Director Dashboard and relevant trackers.</p>
+<div class="notice">Select your name, reporting month and client, then choose the type of information you want to submit. Common fields will be pre-filled automatically.</div>
+<div class="success-note" id="teamSuccess">Entry saved successfully and reflected in the Director dashboard.</div>
+<div class="team-panel"><div class="team-top">
+<div class="field"><label>Team Member</label><select id="teamMember"></select></div>
+<div class="field"><label>Reporting Month</label><input type="month" id="teamMonth"></div>
+<div class="field"><label>Client</label><select id="teamClient"></select></div>
+<div class="field"><label>Assigned Operations SPOC</label><input id="assignedSpoc" readonly placeholder="Auto-assigned from client"></div>
+</div>
+<div class="entry-tabs">
+<button class="entry-tab active" data-entry="expenses">Expense / Rent<small>Rent, CAM, utilities and operating costs</small></button>
+<button class="entry-tab" data-entry="payments">Payment Status<small>Invoice, due date and payment progress</small></button>
+<button class="entry-tab" data-entry="escalations">Escalation<small>Client, vendor, safety or compliance issue</small></button>
+<button class="entry-tab" data-entry="actions">Action / Risk<small>Pending action, issue or risk with due date</small></button>
+<button class="entry-tab" data-entry="vendors">Vendor Review<small>SLA, compliance and performance</small></button>
+</div>
+<div class="inline-form" id="teamForm"></div>
+<div class="team-actions"><button class="btn secondary" id="clearTeamForm">Clear form</button><button class="btn primary" id="saveTeamEntry">Save team entry</button></div>
+</div></section>
+<section id="expenses" class="view"><h2 class="section-title">Monthly Expenses</h2><p class="section-sub">One row per expense or operational cost item.</p><div class="table-wrap" id="expensesTable"></div></section>
+<section id="payments" class="view"><h2 class="section-title">Payment Tracker</h2><p class="section-sub">Outstanding invoices, payment progress and ageing.</p><div class="table-wrap" id="paymentsTable"></div></section>
+<section id="escalations" class="view"><h2 class="section-title">Escalations</h2><p class="section-sub">Material client, finance, vendor, compliance and safety escalations.</p><div class="table-wrap" id="escalationsTable"></div></section>
+<section id="actions" class="view"><h2 class="section-title">Action Tracker</h2><p class="section-sub">Significant issues and risks with owners and due dates.</p><div class="table-wrap" id="actionsTable"></div></section>
+<section id="vendors" class="view"><h2 class="section-title">Vendor Performance</h2><p class="section-sub">Monthly review of critical vendors, SLA and compliance.</p><div class="table-wrap" id="vendorsTable"></div></section>
+<div class="footer">Director Operations dashboard · Hosted on GitHub Pages · Data persists in a shared Supabase database</div>
+</main></div>
+<div class="modal" id="modal"><div class="dialog"><div class="dialog-head"><h3 id="modalTitle">Add record</h3><button class="iconbtn" id="closeModal">×</button></div><div class="form-grid" id="formGrid"></div><div class="dialog-foot"><button class="btn secondary" id="cancelModal">Cancel</button><button class="btn primary" id="saveRecord">Save record</button></div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+const CFG = {"lists": {"Payment Status": ["Invoice Awaited", "Invoice Received", "Submitted", "Approval Pending", "PO Pending", "GRN/SES Pending", "Finance Processing", "Paid", "On Hold", "Disputed", "Overdue"], "RAG": ["Green", "Amber", "Red"], "Priority": ["Low", "Medium", "High", "Critical"], "Escalation Status": ["Open", "Monitoring", "Closed"], "Expense Head": ["Rent", "CAM / Maintenance", "Parking", "Property Charges", "Electricity", "DG / Diesel", "Water", "Internet / Leased Line", "Telephone", "Housekeeping", "Security", "Pest Control", "Technical Maintenance", "HVAC Maintenance", "Electrical Maintenance", "Plumbing", "Fire & Safety", "Lift / Elevator", "Landscaping", "Waste Management", "Transport", "Cafeteria / Food", "Pantry", "Drinking Water", "Office Supplies", "Stationery", "Printing", "Courier", "Employee Engagement", "Projects", "One-time Purchases", "Professional Services", "Miscellaneous"], "Escalation Category": ["Facilities", "Finance", "Vendor", "Employee", "Compliance", "Safety", "Client", "Other"], "Action Status": ["Not Started", "In Progress", "Blocked", "Closed"], "Vendor Rating": ["Excellent", "Good", "Needs Improvement", "Critical"], "Yes/No": ["Yes", "No"], "Client": ["Sonatype", "Theom", "Current", "ABC Fitness", "Guardant Health", "isolved"], "Team Member": ["Madhu Kola", "Samhita", "Mahadipti", "Ram", "Anannya", "Varee"], "Location": ["Hyderabad"], "Month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]}, "headers": {"Monthly Input": ["Reporting Month", "Client", "Location", "Operations Owner", "Expense Head", "Vendor", "Invoice No.", "Invoice Date", "Service Period", "PO No.", "PO Value (₹)", "Invoice Value ex GST (₹)", "GST / Tax (₹)", "Total Amount (₹)", "Monthly Budget (₹)", "Previous Month Actual (₹)", "Variance vs Budget (₹)", "Variance %", "MoM Variance (₹)", "MoM Variance %", "Invoice Received?", "Payment Status", "Payment Due Date", "Payment Date", "Ageing Days", "Ageing Bucket", "RAG Status", "Variance / Delay Remarks"], "Payment Tracker": ["Reporting Month", "Client", "Vendor", "Expense Head", "Invoice No.", "Invoice Date", "Invoice Amount (₹)", "Submission Date", "Due Date", "Payment Status", "Payment Date", "Outstanding Amount (₹)", "Ageing Days", "Ageing Bucket", "Delay Reason", "Current Owner", "Expected Resolution Date", "Business / Vendor Impact"], "Escalations": ["Reporting Month", "Date Raised", "Client", "Category", "Issue / Escalation Summary", "Severity", "Raised By", "Owner", "Immediate Action", "Root Cause", "Corrective Action", "Target Closure Date", "Current Status", "Closure Date", "Days Open", "Leadership Remarks"], "Action Tracker": ["Reporting Month", "Client", "Issue / Risk", "Impact", "Priority", "Action Required", "Owner", "Start Date", "Due Date", "Status", "Days Overdue", "Latest Update", "Leadership Decision / Support"], "Vendor Performance": ["Reporting Month", "Client", "Vendor", "Service Category", "SLA Adherence %", "Manpower Deployment %", "Response Time Rating", "Invoice Accuracy %", "Compliance Docs Complete?", "Incident Count", "Client Feedback", "Corrective Actions Open", "Overall Rating", "Management Remarks", "Renewal / Commercial Risk"]}};
+/* ===================== SHARED DATABASE CONFIG =====================
+   Supabase → Project Settings → Data API → paste the two values below.
+   The anon key is meant to live in client-side code, but with the open
+   policies in supabase/schema.sql it grants read+write to anyone who
+   opens this page. That is the deliberate MVP tradeoff.
+   Leave these blank and the dashboard falls back to browser-only
+   storage, exactly as it behaved before.
+   ================================================================== */
+const SUPABASE_URL      = '';
+const SUPABASE_ANON_KEY  = '';
+/* ================================================================== */
+
+const STORE='zinnov_ops_dashboard_v1';   // offline fallback cache only
+const EMPTY=()=>({expenses:[],payments:[],escalations:[],actions:[],vendors:[]});
+const TABLES={expenses:'monthly_input',payments:'payment_tracker',escalations:'escalations',actions:'action_tracker',vendors:'vendor_performance'};
+
+/* Display header (Excel column) -> Postgres column. Calculated columns are
+   absent on purpose: they are derived by enrich() at render time. */
+const COLMAP={
+ expenses:{
+  'Reporting Month':'reporting_month','Client':'client','Location':'location',
+  'Operations Owner':'operations_owner','Expense Head':'expense_head','Vendor':'vendor',
+  'Invoice No.':'invoice_no','Invoice Date':'invoice_date','Service Period':'service_period',
+  'PO No.':'po_no','PO Value (₹)':'po_value','Invoice Value ex GST (₹)':'invoice_value_ex_gst',
+  'GST / Tax (₹)':'gst_tax','Monthly Budget (₹)':'monthly_budget',
+  'Previous Month Actual (₹)':'previous_month_actual','Invoice Received?':'invoice_received',
+  'Payment Status':'payment_status','Payment Due Date':'payment_due_date',
+  'Payment Date':'payment_date','Variance / Delay Remarks':'variance_delay_remarks'
+ },
+ payments:{
+  'Reporting Month':'reporting_month','Client':'client','Vendor':'vendor',
+  'Expense Head':'expense_head','Invoice No.':'invoice_no','Invoice Date':'invoice_date',
+  'Invoice Amount (₹)':'invoice_amount','Submission Date':'submission_date','Due Date':'due_date',
+  'Payment Status':'payment_status','Payment Date':'payment_date','Delay Reason':'delay_reason',
+  'Current Owner':'current_owner','Expected Resolution Date':'expected_resolution_date',
+  'Business / Vendor Impact':'business_vendor_impact'
+ },
+ escalations:{
+  'Reporting Month':'reporting_month','Date Raised':'date_raised','Client':'client',
+  'Category':'category','Issue / Escalation Summary':'issue_summary','Severity':'severity',
+  'Raised By':'raised_by','Owner':'owner','Immediate Action':'immediate_action',
+  'Root Cause':'root_cause','Corrective Action':'corrective_action',
+  'Target Closure Date':'target_closure_date','Current Status':'current_status',
+  'Closure Date':'closure_date','Leadership Remarks':'leadership_remarks'
+ },
+ actions:{
+  'Reporting Month':'reporting_month','Client':'client','Issue / Risk':'issue_risk',
+  'Impact':'impact','Priority':'priority','Action Required':'action_required','Owner':'owner',
+  'Start Date':'start_date','Due Date':'due_date','Status':'status',
+  'Latest Update':'latest_update','Leadership Decision / Support':'leadership_decision_support'
+ },
+ vendors:{
+  'Reporting Month':'reporting_month','Client':'client','Vendor':'vendor',
+  'Service Category':'service_category','SLA Adherence %':'sla_adherence_pct',
+  'Manpower Deployment %':'manpower_deployment_pct','Response Time Rating':'response_time_rating',
+  'Invoice Accuracy %':'invoice_accuracy_pct','Compliance Docs Complete?':'compliance_docs_complete',
+  'Incident Count':'incident_count','Client Feedback':'client_feedback',
+  'Corrective Actions Open':'corrective_actions_open','Management Remarks':'management_remarks',
+  'Renewal / Commercial Risk':'renewal_commercial_risk'
+ }
+};
+const schema={
+ expenses:{title:'Monthly Expense',source:'Monthly Input',headers:CFG.headers['Monthly Input']},
+ payments:{title:'Payment',source:'Payment Tracker',headers:CFG.headers['Payment Tracker']},
+ escalations:{title:'Escalation',source:'Escalations',headers:CFG.headers['Escalations']},
+ actions:{title:'Management Action',source:'Action Tracker',headers:CFG.headers['Action Tracker']},
+ vendors:{title:'Vendor Review',source:'Vendor Performance',headers:CFG.headers['Vendor Performance']}
+};
+const calcFields=new Set(['Total Amount (₹)','Variance vs Budget (₹)','Variance %','MoM Variance (₹)','MoM Variance %','Ageing Days','Ageing Bucket','RAG Status','Outstanding Amount (₹)','Days Open','Days Overdue','Overall Rating']);
+const selectMap={'Client':'Client','Location':'Location','Expense Head':'Expense Head','Payment Status':'Payment Status','Priority':'Priority','Severity':'Priority','Current Status':'Escalation Status','Status':'Action Status','Category':'Escalation Category','Compliance Docs Complete?':'Yes/No','Invoice Received?':'Yes/No','Response Time Rating':'Vendor Rating','Overall Rating':'Vendor Rating','Operations Owner':'Team Member','Current Owner':'Team Member','Owner':'Team Member'};
+let data=EMPTY(); let active='dashboard', editing=null;
+let sb=null, ONLINE=false, refreshTimer=null;
+
+/* ---------- offline fallback cache ---------- */
+function loadLocal(){try{return Object.assign(EMPTY(),JSON.parse(localStorage.getItem(STORE))||{})}catch(e){return EMPTY()}}
+function saveLocal(){try{localStorage.setItem(STORE,JSON.stringify(data))}catch(e){}}
+function saveData(){saveLocal()}
+function localId(){return 'local-'+Date.now().toString(36)+Math.random().toString(36).slice(2)}
+
+/* ---------- status banner ---------- */
+function setStatus(msg,kind){
+ let el=document.getElementById('dbStatus'); if(!el)return;
+ let c={ok:['#ecfdf3','#abefc6','#067647'],warn:['#fffaeb','#fedf89','#b54708'],err:['#fef3f2','#fecdca','#b42318'],info:['#eff8ff','#b2ddff','#1849a9']}[kind||'info'];
+ el.style.display='block'; el.style.background=c[0]; el.style.borderColor=c[1]; el.style.color=c[2]; el.innerHTML=msg;
+}
+function who(){let m=document.getElementById('teamMember'); return (m&&m.value)||'web'}
+function connectedStatus(){
+ let n=Object.values(data).reduce((s,a)=>s+a.length,0);
+ setStatus('Connected to the shared database · '+n+' record'+(n===1?'':'s')+'. Everyone with this link sees and edits the same data.','ok');
+}
+
+/* ---------- row <-> record translation ---------- */
+function isNumericHeader(h){return h.includes('(₹)')||h.includes('%')||h.includes('Count')}
+function toRow(type,obj){
+ let map=COLMAP[type],row={};
+ for(let h in map){
+  let v=obj[h];
+  if(v===''||v===undefined||v===null){row[map[h]]=null;continue}
+  row[map[h]]=isNumericHeader(h)?num(v):v;
+ }
+ row.updated_by=who();   // updated_at is set by a DB trigger, not the client clock
+ return row;
+}
+function fromRow(type,row){
+ let map=COLMAP[type],o={_id:row.id};
+ for(let h in map){let v=row[map[h]]; o[h]=(v===null||v===undefined)?'':v}
+ return o;
+}
+
+/* ---------- read ---------- */
+async function fetchAll(){
+ let out=EMPTY();
+ await Promise.all(Object.keys(TABLES).map(async t=>{
+  let res=await sb.from(TABLES[t]).select('*').order('updated_at',{ascending:false}).limit(5000);
+  if(res.error)throw new Error(TABLES[t]+': '+res.error.message);
+  out[t]=(res.data||[]).map(r=>fromRow(t,r));
+ }));
+ data=out; saveLocal();
+}
+
+/* ---------- live updates from other people ---------- */
+function subscribe(){
+ let ch=sb.channel('ops-dashboard');
+ Object.values(TABLES).forEach(tbl=>ch.on('postgres_changes',{event:'*',schema:'public',table:tbl},queueRefresh));
+ ch.subscribe();
+}
+function queueRefresh(){
+ clearTimeout(refreshTimer);
+ refreshTimer=setTimeout(async()=>{try{await fetchAll();renderAll()}catch(e){}},300);
+}
+
+/* ---------- write ---------- */
+async function remoteInsert(type,obj){
+ if(!ONLINE){obj._id=localId();data[type].unshift(obj);saveLocal();return}
+ let res=await sb.from(TABLES[type]).insert(toRow(type,obj)).select();
+ if(res.error)throw new Error(res.error.message);
+ data[type].unshift(fromRow(type,res.data[0])); saveLocal();
+}
+async function remoteUpdate(type,id,obj){
+ let i=data[type].findIndex(x=>x._id===id);
+ if(!ONLINE){if(i>-1)data[type][i]=Object.assign({},obj,{_id:id});saveLocal();return}
+ let res=await sb.from(TABLES[type]).update(toRow(type,obj)).eq('id',id).select();
+ if(res.error)throw new Error(res.error.message);
+ if(!res.data||!res.data.length)throw new Error('Record no longer exists — it may have been deleted by someone else.');
+ if(i>-1)data[type][i]=fromRow(type,res.data[0]); saveLocal();
+}
+async function remoteDelete(type,id){
+ if(ONLINE){let res=await sb.from(TABLES[type]).delete().eq('id',id); if(res.error)throw new Error(res.error.message)}
+ data[type]=data[type].filter(x=>x._id!==id); saveLocal();
+}
+function failed(action,e){
+ console.error(action,e);
+ alert('Could not '+action+'.\n\n'+(e&&e.message?e.message:e));
+}
+
+/* ---------- startup ---------- */
+async function boot(){
+ if(!SUPABASE_URL||!SUPABASE_ANON_KEY){
+  data=loadLocal(); renderAll();
+  setStatus('<b>Not connected to the shared database.</b> Open this file and fill in <code>SUPABASE_URL</code> and <code>SUPABASE_ANON_KEY</code>. Until then records are saved in this browser only.','warn');
+  return;
+ }
+ if(!window.supabase){
+  data=loadLocal(); renderAll();
+  setStatus('<b>Could not load the Supabase library</b> (blocked or offline). Records are saved in this browser only.','err');
+  return;
+ }
+ setStatus('Loading shared data…','info');
+ sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+ try{
+  await fetchAll(); ONLINE=true; renderAll(); subscribe();
+ }catch(e){
+  ONLINE=false; data=loadLocal(); renderAll();
+  setStatus('<b>Could not reach the database:</b> '+esc(e.message)+'<br>Working from this browser only — check the URL/key and that supabase/schema.sql has been run.','err');
+ }
+}
+function num(v){let n=parseFloat(String(v??'').replace(/,/g,''));return isFinite(n)?n:0}
+function money(v){return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(num(v))}
+function pct(v){return (num(v)*100).toFixed(1)+'%'}
+function isoMonth(v){if(!v)return''; return String(v).slice(0,7)}
+function today(){return new Date();}
+function daysBetween(a,b){if(!a||!b)return 0;let x=new Date(a),y=new Date(b); return Math.max(0,Math.floor((y-x)/86400000))}
+function enrich(type,r){r={...r}; if(type==='expenses'){r['Total Amount (₹)']=num(r['Invoice Value ex GST (₹)'])+num(r['GST / Tax (₹)']);r['Variance vs Budget (₹)']=num(r['Total Amount (₹)'])-num(r['Monthly Budget (₹)']);r['Variance %']=num(r['Monthly Budget (₹)'])?r['Variance vs Budget (₹)']/num(r['Monthly Budget (₹)']):0;r['MoM Variance (₹)']=num(r['Total Amount (₹)'])-num(r['Previous Month Actual (₹)']);r['MoM Variance %']=num(r['Previous Month Actual (₹)'])?r['MoM Variance (₹)']/num(r['Previous Month Actual (₹)']):0;let end=r['Payment Date']||new Date().toISOString().slice(0,10);r['Ageing Days']=r['Invoice Date']?daysBetween(r['Invoice Date'],end):0;r['Ageing Bucket']=ageBucket(r['Ageing Days']);let vp=Math.abs(num(r['Variance %']));r['RAG Status']=vp>.1?'Red':vp>.05?'Amber':'Green'}
+ if(type==='payments'){r['Outstanding Amount (₹)']=r['Payment Status']==='Paid'?0:num(r['Invoice Amount (₹)']);let end=r['Payment Date']||new Date().toISOString().slice(0,10);r['Ageing Days']=r['Invoice Date']?daysBetween(r['Invoice Date'],end):0;r['Ageing Bucket']=ageBucket(r['Ageing Days'])}
+ if(type==='escalations'){let end=r['Closure Date']||new Date().toISOString().slice(0,10);r['Days Open']=r['Date Raised']?daysBetween(r['Date Raised'],end):0}
+ if(type==='actions'){r['Days Overdue']=(r['Status']==='Closed'||!r['Due Date'])?0:daysBetween(r['Due Date'],new Date().toISOString().slice(0,10))}
+ if(type==='vendors'){let vals=[num(r['SLA Adherence %']),num(r['Manpower Deployment %']),num(r['Invoice Accuracy %'])].filter(x=>x>0);let avg=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;r['Overall Rating']=avg>=.95?'Excellent':avg>=.85?'Good':avg>=.7?'Needs Improvement':'Critical'} return r}
+function ageBucket(d){return d>90?'Above 90':d>60?'61–90':d>30?'31–60':'0–30'}
+function filterRows(type){let m=document.getElementById('globalMonth').value,c=document.getElementById('globalClient').value;return data[type].map(x=>enrich(type,x)).filter(r=>(!m||isoMonth(r['Reporting Month'])===m)&&(!c||c==='All'||r['Client']===c))}
+function fillClient(){let s=document.getElementById('globalClient'),cur=s.value||'All';let clients=new Set(CFG.lists.Client||[]);Object.values(data).flat().forEach(r=>r.Client&&clients.add(r.Client));s.innerHTML='<option>All</option>'+[...clients].map(c=>`<option ${c===cur?'selected':''}>${esc(c)}</option>`).join('')}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function displayValue(h,v){if(v==null||v==='')return'';if(h.includes('(₹)'))return money(v);if(h.includes('%'))return pct(v);if(['RAG Status','Priority','Severity','Current Status','Status','Payment Status','Overall Rating'].includes(h))return `<span class="pill ${pillClass(v)}">${esc(v)}</span>`;return esc(v)}
+function pillClass(v){v=String(v).toLowerCase();if(v.includes('green')||v==='paid'||v==='closed'||v==='excellent'||v==='good')return'green';if(v.includes('red')||v.includes('critical')||v.includes('overdue')||v.includes('blocked'))return'red';if(v.includes('amber')||v.includes('medium')||v.includes('pending')||v.includes('hold')||v.includes('improvement')||v.includes('monitor'))return'amber';if(v.includes('high')||v.includes('disputed'))return'purple';return'blue'}
+function renderTable(type,target){let rows=filterRows(type),hs=schema[type].headers;let viewHs=hs.filter((h,i)=>i<14||['RAG Status','Leadership Remarks','Leadership Decision / Support','Renewal / Commercial Risk','Business / Vendor Impact'].includes(h));if(!rows.length){document.getElementById(target).innerHTML='<div class="empty">No records for the selected filters. Use <b>+ Add record</b> to begin.</div>';return}let out='<table><thead><tr>'+viewHs.map(h=>`<th>${esc(h)}</th>`).join('')+'<th>Actions</th></tr></thead><tbody>';rows.forEach(r=>{let idx=data[type].findIndex(x=>x._id===r._id);out+='<tr>'+viewHs.map(h=>`<td>${displayValue(h,r[h])}</td>`).join('')+`<td class="row-actions"><button onclick="editRow('${type}',${idx})">Edit</button><button class="del" onclick="deleteRow('${type}',${idx})">Delete</button></td></tr>`});out+='</tbody></table>';document.getElementById(target).innerHTML=out}
+const CLIENT_SPOC={'Sonatype':'Mahadipti','Theom':'Varee','Current':'Madhu Kola','ABC Fitness':'Samhita','Guardant Health':'Ram','isolved':'Anannya'};
+let teamEntryType='expenses';
+function fillTeamSelectors(){
+ let member=document.getElementById('teamMember'); if(!member)return;
+ let curM=member.value; member.innerHTML='<option value="">Select team member</option>'+CFG.lists['Team Member'].map(x=>`<option ${x===curM?'selected':''}>${esc(x)}</option>`).join('');
+ let cl=document.getElementById('teamClient'),curC=cl.value; let clients=new Set(CFG.lists.Client||[]); Object.values(data).flat().forEach(r=>r.Client&&clients.add(r.Client)); cl.innerHTML='<option value="">Select client</option>'+[...clients].map(x=>`<option ${x===curC?'selected':''}>${esc(x)}</option>`).join('');
+ syncClientSpoc();
+}
+function syncClientSpoc(){
+ let cl=document.getElementById('teamClient'),member=document.getElementById('teamMember'),spoc=document.getElementById('assignedSpoc'); if(!cl||!member)return;
+ let assigned=CLIENT_SPOC[cl.value]||''; if(spoc)spoc.value=assigned; if(assigned)member.value=assigned;
+}
+function teamFieldExcluded(h){return calcFields.has(h)||['Reporting Month','Client','Operations Owner','Current Owner','Owner','Location'].includes(h)}
+function renderTeamForm(){
+ let hs=schema[teamEntryType].headers.filter(h=>!teamFieldExcluded(h)); let form='';
+ hs.forEach(h=>{let key=selectMap[h],input='';
+  if(key&&CFG.lists[key]) input=`<select data-team-field="${esc(h)}"><option value=""></option>${CFG.lists[key].map(x=>`<option>${esc(x)}</option>`).join('')}</select>`;
+  else if(h.toLowerCase().includes('date')) input=`<input data-team-field="${esc(h)}" type="date">`;
+  else if(h.includes('(₹)')||h.includes('%')||h.includes('Count')) input=`<input data-team-field="${esc(h)}" type="number" step="any" ${h.includes('%')?'data-percent="1"':''}>`;
+  else if(h.includes('Summary')||h.includes('Remarks')||h.includes('Action')||h.includes('Cause')||h.includes('Impact')||h.includes('Update')||h.includes('Decision')||h.includes('Feedback')||h.includes('Risk')||h.includes('Reason')) input=`<textarea data-team-field="${esc(h)}" rows="2"></textarea>`;
+  else input=`<input data-team-field="${esc(h)}">`;
+  form+=`<div class="field"><label>${esc(h)}</label>${input}</div>`;
+ });
+ document.getElementById('teamForm').innerHTML=form;
+}
+function clearTeamForm(){document.querySelectorAll('#teamForm input,#teamForm textarea,#teamForm select').forEach(el=>el.value='')}
+async function saveTeamEntry(){
+ let member=document.getElementById('teamMember').value, month=document.getElementById('teamMonth').value, client=document.getElementById('teamClient').value;
+ if(!member||!month||!client){alert('Please select Team Member, Reporting Month and Client before saving.');return}
+ let obj={'Reporting Month':month,'Client':client,'Location':'Hyderabad'};
+ if(teamEntryType==='expenses')obj['Operations Owner']=member; if(teamEntryType==='payments')obj['Current Owner']=member; if(teamEntryType==='escalations'||teamEntryType==='actions')obj['Owner']=member;
+ document.querySelectorAll('#teamForm [data-team-field]').forEach(el=>{let v=el.value;if(el.dataset.percent==='1')v=num(v)/100;obj[el.dataset.teamField]=v});
+ let btn=document.getElementById('saveTeamEntry'); btn.disabled=true; let label=btn.textContent; btn.textContent='Saving…';
+ try{ await remoteInsert(teamEntryType,obj); clearTeamForm(); renderAll(); let n=document.getElementById('teamSuccess'); n.classList.add('show'); setTimeout(()=>n.classList.remove('show'),2500); }
+ catch(e){ failed('save this entry',e) }
+ finally{ btn.disabled=false; btn.textContent=label }
+}
+function initTeamEntry(){fillTeamSelectors();renderTeamForm();document.getElementById('teamClient').onchange=syncClientSpoc;document.querySelectorAll('.entry-tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.entry-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');teamEntryType=b.dataset.entry;renderTeamForm()});document.getElementById('saveTeamEntry').onclick=saveTeamEntry;document.getElementById('clearTeamForm').onclick=clearTeamForm}
+function renderAll(){if(ONLINE)connectedStatus();fillClient();fillTeamSelectors();renderDashboard();renderTable('expenses','expensesTable');renderTable('payments','paymentsTable');renderTable('escalations','escalationsTable');renderTable('actions','actionsTable');renderTable('vendors','vendorsTable')}
+function renderDashboard(){let ex=filterRows('expenses'),pa=filterRows('payments'),es=filterRows('escalations'),ac=filterRows('actions'),ve=filterRows('vendors');let spend=ex.reduce((s,r)=>s+num(r['Total Amount (₹)']),0),budget=ex.reduce((s,r)=>s+num(r['Monthly Budget (₹)']),0),variance=spend-budget,out=pa.reduce((s,r)=>s+num(r['Outstanding Amount (₹)']),0);let openEsc=es.filter(r=>r['Current Status']!=='Closed'),overAct=ac.filter(r=>num(r['Days Overdue'])>0);document.getElementById('kSpend').textContent=money(spend);document.getElementById('kBudget').textContent=money(budget);document.getElementById('kVariance').textContent=money(variance);document.getElementById('kVariancePct').textContent=(budget?((variance/budget)*100).toFixed(1):'0.0')+'% vs budget';document.getElementById('varCard').className='kpi '+(variance>0?'risk':'good');document.getElementById('kOutstanding').textContent=money(out);document.getElementById('kOverdueInv').textContent=pa.filter(r=>r['Payment Status']==='Overdue'||(r['Due Date']&&new Date(r['Due Date'])<today()&&r['Payment Status']!=='Paid')).length+' overdue invoices';document.getElementById('kEsc').textContent=openEsc.length;document.getElementById('kCritical').textContent=openEsc.filter(r=>['High','Critical'].includes(r['Severity'])).length+' high/critical';document.getElementById('kActions').textContent=overAct.length;
+ let heads={};ex.forEach(r=>{let h=r['Expense Head']||'Other';heads[h]??={a:0,b:0};heads[h].a+=num(r['Total Amount (₹)']);heads[h].b+=num(r['Monthly Budget (₹)'])});let top=Object.entries(heads).sort((a,b)=>b[1].a-a[1].a).slice(0,8);document.getElementById('financialBars').innerHTML=top.length?top.map(([h,v])=>{let max=Math.max(v.a,v.b,1),w=Math.min(100,v.a/max*100);return `<div class="bar-row"><span>${esc(h)}</span><div class="bar-track"><div class="bar ${v.a>v.b?'over':''}" style="width:${w}%"></div></div><b>${money(v.a)}</b></div>`}).join(''):'<div class="empty">Add expense records to see spend analysis.</div>';
+ let buckets={'0–30':0,'31–60':0,'61–90':0,'Above 90':0};pa.forEach(r=>buckets[r['Ageing Bucket']]=(buckets[r['Ageing Bucket']]||0)+num(r['Outstanding Amount (₹)']));let mx=Math.max(...Object.values(buckets),1);document.getElementById('ageingBars').innerHTML=Object.entries(buckets).map(([k,v])=>`<div class="bar-row"><span>${k} days</span><div class="bar-track"><div class="bar ${k==='Above 90'||k==='61–90'?'over':''}" style="width:${v/mx*100}%"></div></div><b>${money(v)}</b></div>`).join('');
+ let rag={Green:0,Amber:0,Red:0};ex.forEach(r=>rag[r['RAG Status']]++);let total=Math.max(ex.length,1);document.getElementById('healthBars').innerHTML=['Green','Amber','Red'].map(k=>`<div class="bar-row"><span>${k}</span><div class="bar-track"><div class="bar ${k==='Amber'||k==='Red'?'over':''}" style="width:${rag[k]/total*100}%"></div></div><b>${rag[k]}</b></div>`).join('');
+ let att=[];openEsc.filter(r=>['High','Critical'].includes(r['Severity'])).slice(0,3).forEach(r=>att.push({tag:r['Severity'],title:r['Issue / Escalation Summary']||'Escalation',sub:(r['Client']||'')+' · Owner: '+(r['Owner']||'Not assigned')}));overAct.slice(0,3).forEach(r=>att.push({tag:'Overdue',title:r['Issue / Risk']||r['Action Required']||'Action',sub:(r['Client']||'')+' · '+r['Days Overdue']+' days overdue'}));pa.filter(r=>num(r['Ageing Days'])>60&&num(r['Outstanding Amount (₹)'])>0).slice(0,3).forEach(r=>att.push({tag:'Payment',title:(r['Vendor']||'Vendor')+' payment '+money(r['Outstanding Amount (₹)']),sub:(r['Client']||'')+' · '+r['Ageing Bucket']+' days'}));document.getElementById('attentionList').innerHTML=att.length?att.slice(0,7).map(x=>`<div class="risk-item"><span class="pill ${pillClass(x.tag)}">${esc(x.tag)}</span><div><strong>${esc(x.title)}</strong><br><span>${esc(x.sub)}</span></div><span>›</span></div>`).join(''):'<div class="empty">No management exceptions in the selected view.</div>'}
+function openModal(type,idx=null){active=type;editing=idx;let hs=schema[type].headers.filter(h=>!calcFields.has(h));document.getElementById('modalTitle').textContent=(idx==null?'Add ':'Edit ')+schema[type].title;let r=idx==null?{}:data[type][idx];let form='';hs.forEach(h=>{let v=r[h]??'',key=selectMap[h];let input='';if(key&&CFG.lists[key])input=`<select data-field="${esc(h)}"><option value=""></option>${CFG.lists[key].map(x=>`<option ${String(v)===String(x)?'selected':''}>${esc(x)}</option>`).join('')}</select>`;else if(h.toLowerCase().includes('date')||h==='Reporting Month')input=`<input data-field="${esc(h)}" type="${h==='Reporting Month'?'month':'date'}" value="${esc(h==='Reporting Month'?isoMonth(v):v)}">`;else if(h.includes('(₹)')||h.includes('%')||h.includes('Count'))input=`<input data-field="${esc(h)}" type="number" step="any" value="${esc(h.includes('%')&&num(v)<=1?num(v)*100:v)}" ${h.includes('%')?'data-percent="1"':''}>`;else if(h.includes('Summary')||h.includes('Remarks')||h.includes('Action')||h.includes('Cause')||h.includes('Impact')||h.includes('Update')||h.includes('Decision')||h.includes('Feedback')||h.includes('Risk'))input=`<textarea data-field="${esc(h)}" rows="2">${esc(v)}</textarea>`;else input=`<input data-field="${esc(h)}" value="${esc(v)}">`;form+=`<div class="field"><label>${esc(h)}</label>${input}</div>`});document.getElementById('formGrid').innerHTML=form;document.getElementById('modal').classList.add('show')}
+function closeModal(){document.getElementById('modal').classList.remove('show');editing=null}
+async function saveRecord(){
+ let type=active, existing=editing==null?null:data[type][editing];
+ let obj=existing?{...existing}:{};
+ document.querySelectorAll('#formGrid [data-field]').forEach(el=>{let v=el.value;if(el.dataset.percent==='1')v=num(v)/100;obj[el.dataset.field]=v});
+ let btn=document.getElementById('saveRecord'); btn.disabled=true; let label=btn.textContent; btn.textContent='Saving…';
+ try{
+  if(existing) await remoteUpdate(type,existing._id,obj); else await remoteInsert(type,obj);
+  closeModal(); renderAll();
+ }catch(e){ failed('save this record',e) }
+ finally{ btn.disabled=false; btn.textContent=label }
+}
+window.editRow=(t,i)=>openModal(t,i);
+window.deleteRow=async(t,i)=>{
+ let rec=data[t][i]; if(!rec)return;
+ if(!confirm('Delete this record? This removes it for everyone.'))return;
+ try{ await remoteDelete(t,rec._id); renderAll() }catch(e){ failed('delete this record',e) }
+};
+function csvExport(){if(active==='dashboard'||active==='teamEntry'){alert('Open a tracker tab to export its filtered records.');return}let rows=filterRows(active),hs=schema[active].headers;let csv=[hs,...rows.map(r=>hs.map(h=>r[h]??''))].map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');let blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`Zinnov_${active}_${document.getElementById('globalMonth').value||'all'}.csv`;a.click();URL.revokeObjectURL(a.href)}
+document.querySelectorAll('.navbtn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.navbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');active=b.dataset.view;document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(active).classList.add('active');document.getElementById('addBtn').style.display=(active==='dashboard'||active==='teamEntry')?'none':'inline-block';renderAll()});
+document.getElementById('addBtn').style.display='none';document.getElementById('addBtn').onclick=()=>openModal(active);document.getElementById('closeModal').onclick=closeModal;document.getElementById('cancelModal').onclick=closeModal;document.getElementById('saveRecord').onclick=saveRecord;document.getElementById('globalMonth').onchange=renderAll;document.getElementById('globalClient').onchange=renderAll;document.getElementById('resetFilters').onclick=()=>{document.getElementById('globalMonth').value='';document.getElementById('globalClient').value='All';renderAll()};document.getElementById('exportBtn').onclick=csvExport;document.getElementById('modal').onclick=e=>{if(e.target.id==='modal')closeModal()};
+initTeamEntry();
+boot();
+</script>
+</body></html>
